@@ -40,7 +40,7 @@ public abstract class StudioPrint : MonoBehaviour
             image = ScreenCapture.CaptureScreenshotAsTexture();
             Directory.CreateDirectory(DirectoryName);
             string name = Prefix + "-" + DateTime.Now.ToString("yyyyMMdd-HHmmss-fff") + ".png";
-            File.WriteAllBytes(Path.Combine(DirectoryName, name), image.EncodeToPNG());
+            BrowserTools.Picture(Path.Combine(DirectoryName, name), image.EncodeToPNG());
             if (Game.Reviewing) Debug.Log(CheckMarker + " " + name);
             else Game.Notice(Caption + "を保存しました　 F9 でアルバムを開く");
         }
@@ -54,9 +54,13 @@ public abstract class StudioPrint : MonoBehaviour
         try
         {
             Directory.CreateDirectory(DirectoryName);
+#if UNITY_WEBGL && !UNITY_EDITOR
+            BrowserTools.Album(DirectoryName);
+#else
             System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo {
                 FileName = DirectoryName, UseShellExecute = true
             });
+#endif
         }
         catch (Exception ex) when (ex is IOException || ex is UnauthorizedAccessException ||
             ex is System.ComponentModel.Win32Exception)

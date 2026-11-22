@@ -31,8 +31,12 @@ public abstract class StudioGame : MonoBehaviour
     AudioClip[] chimes;
     public static string Argument(string name)
     {
+        #if UNITY_WEBGL && !UNITY_EDITOR
+        return null;
+#else
         var args=Environment.GetCommandLineArgs();int n=Array.IndexOf(args,name);
         return n<0||n+1>=args.Length?null:args[n+1];
+#endif
     }
     protected abstract void BeginGame();
     protected abstract void TickGame();
@@ -53,8 +57,8 @@ public abstract class StudioGame : MonoBehaviour
         slot=review!=null?1:Mathf.Clamp(PlayerPrefs.GetInt("slot-"+skin.key,1),1,3);
         StorageDirectory=review!=null ? Path.Combine(Path.GetFullPath(review),"test-save",skin.key)
             : Path.Combine(Application.persistentDataPath,skin.key,"Slot"+slot);
-        body=Font.CreateDynamicFontFromOSFont(new[]{"Meiryo","Yu Gothic","Arial"},23);
-        heading=Font.CreateDynamicFontFromOSFont(new[]{"Yu Mincho","MS Mincho","Meiryo"},42);
+        body=BrowserTools.ReadableFont(new[]{"Meiryo","Yu Gothic","Arial"},23);
+        heading=BrowserTools.ReadableFont(new[]{"Yu Mincho","MS Mincho","Meiryo"},42);
         veil=new Texture2D(128,1,TextureFormat.RGBA32,false);
         for(int i=0;i<128;i++)veil.SetPixel(i,0,new Color(.015f,.035f,.06f,.91f*(1-Mathf.SmoothStep(0,1,i/122f))));
         veil.wrapMode=TextureWrapMode.Clamp;veil.Apply();
@@ -130,7 +134,8 @@ public abstract class StudioGame : MonoBehaviour
         try
         {
             Directory.CreateDirectory(StorageDirectory);File.WriteAllText(tmp,JsonUtility.ToJson(data,true));
-            if(File.Exists(path))File.Replace(tmp,path,path+".bak");else File.Move(tmp,path);
+            if(File.Exists(path))BrowserTools.ReplaceFile(tmp,path,path+".bak");else File.Move(tmp,path);
+            BrowserTools.Saved();
         }
         catch(Exception e) when(e is IOException||e is UnauthorizedAccessException)
         {Notice("保存先を確認してください");Debug.LogWarning(e.Message);}
@@ -138,6 +143,8 @@ public abstract class StudioGame : MonoBehaviour
     protected void QuitGame(){if(hasStarted)SaveCheckpoint();
 #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying=false;
+#elif UNITY_WEBGL
+        BrowserTools.ReturnToCover();
 #else
         Application.Quit();
 #endif
@@ -284,7 +291,7 @@ public abstract class StudioGame : MonoBehaviour
                 }
                 if(high-low<.08f)throw new InvalidDataException("描画のないフレーム "+path);
             }
-            Directory.CreateDirectory(Path.GetDirectoryName(path));File.WriteAllBytes(path,image.EncodeToPNG());
+            Directory.CreateDirectory(Path.GetDirectoryName(path));BrowserTools.Picture(path,image.EncodeToPNG());
         }
         finally{Destroy(image);}
     }
