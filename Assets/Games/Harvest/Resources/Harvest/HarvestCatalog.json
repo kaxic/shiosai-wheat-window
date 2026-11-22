@@ -1,0 +1,36 @@
+{
+  "crops": [
+    {"id":"wheat","name":"小麦","season":0,"days":2,"seedPrice":3,"sellPrice":3,"yieldCount":3},
+    {"id":"turnip","name":"かぶ","season":0,"days":1,"seedPrice":3,"sellPrice":3,"yieldCount":2},
+    {"id":"tomato","name":"トマト","season":1,"days":2,"seedPrice":4,"sellPrice":4,"yieldCount":3},
+    {"id":"bean","name":"青豆","season":1,"days":1,"seedPrice":3,"sellPrice":3,"yieldCount":2},
+    {"id":"pumpkin","name":"かぼちゃ","season":2,"days":3,"seedPrice":5,"sellPrice":6,"yieldCount":3},
+    {"id":"corn","name":"とうもろこし","season":2,"days":2,"seedPrice":4,"sellPrice":4,"yieldCount":3},
+    {"id":"cabbage","name":"キャベツ","season":3,"days":2,"seedPrice":4,"sellPrice":4,"yieldCount":3},
+    {"id":"carrot","name":"にんじん","season":3,"days":1,"seedPrice":3,"sellPrice":3,"yieldCount":2}
+  ],
+  "recipes": [
+    {"id":"roll","name":"窓辺の丸パン","note":"小麦の香りを閉じ込めた食堂の定番。","price":10,"items":["wheat"],"amounts":[1],"steps":[3,2]},
+    {"id":"white_soup","name":"かぶの白いスープ","note":"若いかぶを、口あたりよく煮含める。","price":11,"items":["turnip"],"amounts":[1],"steps":[0,1]},
+    {"id":"quiche","name":"春野菜のキッシュ","note":"刻んだ春野菜を生地に合わせて焼き上げる。","price":19,"items":["wheat","turnip"],"amounts":[1,1],"steps":[0,3,2]},
+    {"id":"tomato_sauce","name":"完熟トマトソース","note":"甘みを引き出すまで、赤い果肉を煮詰める。","price":12,"items":["tomato"],"amounts":[1],"steps":[0,1,3]},
+    {"id":"pea_soup","name":"青豆のポタージュ","note":"やわらかく煮た青豆をなめらかに仕上げる。","price":11,"items":["bean"],"amounts":[1],"steps":[1,3]},
+    {"id":"ratatouille","name":"夏畑のラタトゥイユ","note":"トマトと豆に焼き目を付け、ひと鍋に。","price":20,"items":["tomato","bean"],"amounts":[1,1],"steps":[0,2,1]},
+    {"id":"roast_pumpkin","name":"かぼちゃの蜜焼き","note":"厚く切り、蜜を絡めて香ばしく焼く。","price":15,"items":["pumpkin"],"amounts":[1],"steps":[0,3,2]},
+    {"id":"corn_soup","name":"黄金コーンスープ","note":"一粒ずつの甘みを温かな器に集める。","price":12,"items":["corn"],"amounts":[1],"steps":[0,1,3]},
+    {"id":"gratin","name":"実りのグラタン","note":"秋の二色を重ね、表面をこんがりと。","price":23,"items":["pumpkin","corn"],"amounts":[1,1],"steps":[0,1,3,2]},
+    {"id":"cabbage_steak","name":"焼きキャベツの温皿","note":"くし切りにした葉の断面を焦がす。","price":13,"items":["cabbage"],"amounts":[1],"steps":[0,2]},
+    {"id":"carrot_soup","name":"にんじんのポタージュ","note":"冬の根菜を蒸し煮にし、まろやかに。","price":11,"items":["carrot"],"amounts":[1],"steps":[0,1,3]},
+    {"id":"pot_au_feu","name":"冬野菜のポトフ","note":"大きめに切った野菜を静かに煮込む。","price":20,"items":["cabbage","carrot"],"amounts":[1,1],"steps":[0,2,1]},
+    {"id":"pizza","name":"薪窯のトマトピッツァ","note":"小麦の生地をのばし、彩りをのせて焼く。","price":21,"items":["wheat","tomato"],"amounts":[1,1],"steps":[3,0,2]},
+    {"id":"harvest_pie","name":"かぼちゃの収穫パイ","note":"かぼちゃ餡を麦の生地で包む。","price":25,"items":["wheat","pumpkin"],"amounts":[1,1],"steps":[0,1,3,2]},
+    {"id":"carrot_cake","name":"星形キャロットケーキ","note":"根菜を刻み、星の型に入れて焼く。","price":21,"items":["wheat","carrot"],"amounts":[1,1],"steps":[0,3,2]},
+    {"id":"galette","name":"彩り豆のガレット","note":"香り豊かな豆とコーンを薄くまとめる。","price":20,"items":["bean","corn"],"amounts":[1,1],"steps":[1,3,2]}
+  ],
+  "seasons": [
+    {"name":"春","festival":"芽吹きの昼餐会","signature":"quiche","starter":"turnip","menu":["roll","white_soup","quiche"],"specials":["quiche","pizza","carrot_cake"],"guests":["郵便屋のハナ","花屋のサキ","パン職人のノエ"],"servings":1},
+    {"name":"夏","festival":"涼風の夕涼み市","signature":"ratatouille","starter":"bean","menu":["tomato_sauce","pea_soup","ratatouille"],"specials":["ratatouille","pizza","galette"],"guests":["船大工のナギ","魚屋のミオ","旅人のソル"],"servings":2},
+    {"name":"秋","festival":"金穂の収穫祭","signature":"gratin","starter":"corn","menu":["roast_pumpkin","corn_soup","gratin"],"specials":["gratin","harvest_pie","galette"],"guests":["窯元のレイ","木工師のトワ","織り手のキヌ"],"servings":2},
+    {"name":"冬","festival":"灯りの晩餐会","signature":"pot_au_feu","starter":"carrot","menu":["cabbage_steak","carrot_soup","pot_au_feu"],"specials":["pot_au_feu","carrot_cake","harvest_pie"],"guests":["灯台守のレン","書店のアオ","楽師のユラ"],"servings":3}
+  ]
+}

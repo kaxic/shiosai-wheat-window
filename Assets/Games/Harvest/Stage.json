@@ -1,0 +1,11 @@
+{
+  "key": "Harvest",
+  "title": "麦窓食堂",
+  "english": "THE WHEAT WINDOW",
+  "product": "The Wheat Window",
+  "introduction": "窓辺の畑から、季節のひと皿を。\n種をまき、小さな食堂に今日の料理を届けましょう。",
+  "controls": "WASD・矢印で歩く。Pで種を選び、畑の前でEを押して種まき・水やり・収穫。Nで就寝すると翌日になります。\n\nK 厨房　O 配膳　M 売店　B 帳簿　G 品評会。厨房でレシピを選び、表示された工程を黄金の帯に合わせて仕上げます。",
+  "accent": "#E3AA66",
+  "ink": "#31352D",
+  "paper": "#F9EFDA"
+}
