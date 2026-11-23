@@ -2,23 +2,32 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#15272a"><title>D 畑と料理の食堂経営 | 潮彩作品集</title>
+  <meta name="theme-color" content="#15272a"><meta name="description" content="前庭と水車の段丘園で野菜を育て、その収穫で小さな食堂を営みます。春のキッシュから冬のポトフまで、畑の旬を献立に取り入れて注文を仕上げましょう。">
+  <title>D農業ゲーム | 潮彩ゲーム棚</title>
   <link rel="icon" href="icon.png"><link rel="stylesheet" href="player.css"><link rel="stylesheet" href="touch.css"><script defer src="touch.js"></script>
 </head>
 <body>
 <header><a class="imprint" id="library-home" href="https://kaxic.github.io/shiosai-game-library/#D"><span aria-hidden="true">← </span>ゲーム一覧</a><span id="home-status" role="status"></span><a href="https://github.com/kaxic/shiosai-wheat-window">GitHub ↗</a></header>
 <main>
   <section id="stage" aria-label="ゲーム画面">
-    <canvas id="game" data-game="Harvest" width="1280" height="720" tabindex="0" aria-label="D 畑と料理の食堂経営のゲーム画面"></canvas>
+    <canvas id="game" data-game="Harvest" width="1280" height="720" tabindex="0" aria-label="D農業ゲームのゲーム画面"></canvas>
     <div id="cover">
-      <div class="titleblock"><p class="genre">麦窓食堂</p><h1>D 畑と料理の食堂経営</h1><p class="intro">水車が回る段丘園と麦窓の前庭を行き来し、十六種の作物を育てよう。
-三十二品の献立で、四季の食卓を彩ります。</p>
-        <button id="launch">ゲームを開始 <span aria-hidden="true">›</span></button>
+      <div class="titleblock"><p class="genre">麦窓食堂</p><h1>D農業ゲーム</h1><p class="intro">前庭と水車の段丘園で野菜を育て、その収穫で小さな食堂を営みます。春のキッシュから冬のポトフまで、畑の旬を献立に取り入れて注文を仕上げましょう。</p>
+        <div class="cover-actions"><button id="launch">ゲームを開始 <span aria-hidden="true">›</span></button>
+          <a href="#how-to-play">遊び方を読む <span aria-hidden="true">↓</span></a></div>
         <div id="status" role="status" aria-live="polite"></div><progress id="meter" max="1" value="0" hidden></progress>
       </div>
     </div>
   </section>
-  <div class="bar"><span class="wordmark">D 畑と料理の食堂経営</span><div class="buttons"><button id="help">操作方法</button><button id="full">全画面</button><a id="demo" href="media/demo.mp4" hidden>プレイ映像 ▷</a></div></div>
+  <div class="bar"><span class="wordmark">D農業ゲーム</span><div class="buttons"><button id="help">操作方法</button><button id="full">全画面</button><a id="demo" href="media/demo.mp4" hidden>プレイ映像 ▷</a></div></div>
+  <section class="play-guide" id="how-to-play" aria-labelledby="guide-title" tabindex="-1">
+    <h2 id="guide-title">このゲームの遊び方</h2>
+    <div class="guide-columns">
+      <section><h3>最初にすること</h3><p>厨房の献立帳を開き、手元の小麦で「窓辺の丸パン」を選びましょう。「和える」「焼く」の順に針を止めます。焼けたパンをお客に配膳したら、売上で次にまく種を買えます。</p></section>
+      <section><h3>遊びの流れ</h3><p>種をまいて水をやり、眠ると作物が育ちます。段丘園には偶数日の朝に水が入るので、前庭と作付けを分けるのも手です。収穫後はそのまま売るか、厨房でひと手間加えるかを選べます。</p></section>
+      <section><h3>目指すもの</h3><p>二つの畑の計24区画で16種類の作物を育て、32品の献立に挑みましょう。上質な材料と調理の腕で特選料理を仕上げて四季の品評会へ。翌年は配膳や出品の目標も上がります。</p></section>
+    </div>
+  </section>
   <dialog id="guide"><div class="dialogtop"><h2>操作方法</h2><button class="close">閉じる</button></div><p>キーボードとマウスで遊べます。進行はこのブラウザーに保存されます。</p><div id="controls">WASD・矢印で歩く。Pで種を選び、畑の前でEを押して種まき・水やり・収穫。Nで就寝すると翌日になります。
 
 K 厨房　O 配膳　M 売店　B 帳簿　G 品評会。厨房でレシピを選び、表示された工程を黄金の帯に合わせて仕上げます。
@@ -36,7 +45,7 @@ const meter=document.getElementById('meter');
 let instance=null;
 const build='Build/';
 const config={
-  dataUrl:build+'2cb6564465a026bcafa3f27b4e1bb6fd.data.unityweb',frameworkUrl:build+'d68dd3bf373852aa121b859b09127fa7.framework.js.unityweb',codeUrl:build+'60aee53351d14d777ae15e62f6f5e804.wasm.unityweb',
+  dataUrl:build+'e7ca6a96879c2b57c5b141c191c63a83.data.unityweb',frameworkUrl:build+'d68dd3bf373852aa121b859b09127fa7.framework.js.unityweb',codeUrl:build+'60aee53351d14d777ae15e62f6f5e804.wasm.unityweb',
   streamingAssetsUrl:'StreamingAssets',companyName:'Shiosai Works',productName:'The Wheat Window',productVersion:'1.0',
   devicePixelRatio:Math.min(1.5,window.devicePixelRatio||1),
   showBanner:function(message,type){ if(type==='error'){statusLine.textContent='読み込みに失敗しました。ページを再読み込みしてください。';console.error(message);} }

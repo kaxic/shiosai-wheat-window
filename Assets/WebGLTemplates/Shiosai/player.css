@@ -11,3 +11,13 @@ dialog{color:var(--paper);border:1px solid #54706b;background:#1d3234;width:min(
 @media(max-width:700px){header{height:52px}.titleblock{max-width:90%}.intro{font-size:13px;margin:.3em 0}.genre{margin:0 0 .4em}.bar{flex-wrap:wrap}.titleblock button{padding:.4em .8em}#status:empty{display:none}}
 .imprint{letter-spacing:.08em;color:var(--paper)}#home-status{font-size:13px;color:var(--quiet)}.titleblock h1{font-size:clamp(24px,4.1vw,60px);text-wrap:balance}
 @media(max-width:520px){#stage:has(#cover:not([hidden])){min-height:246px}.wordmark{font-size:16px}#home-status{font-size:11px}}
+.cover-actions{display:flex;align-items:baseline;flex-wrap:wrap;gap:.6rem 1.5rem}
+.cover-actions a{color:var(--paper);font-size:clamp(14px,1.2vw,17px);text-underline-offset:.32em}
+.play-guide{margin:.6rem 0 clamp(2rem,6vw,5rem);padding:clamp(22px,3.8vw,48px);background:#f1ead9;color:#213330;border-top:3px solid #ba985a;scroll-margin-top:12px}
+.play-guide h2{font-size:clamp(23px,3vw,36px);font-weight:600}
+.guide-columns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(18px,3vw,40px);margin-top:1.3rem}
+.guide-columns section{border-top:1px solid #bbbaa6;padding-top:1rem}
+.guide-columns h3{font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(18px,1.6vw,22px);margin:0 0 .45em}
+.guide-columns p{margin:0;font-size:clamp(15px,1.25vw,18px);line-height:1.9;overflow-wrap:anywhere}
+@media(max-width:760px){.guide-columns{grid-template-columns:1fr;gap:1.15rem}.play-guide{padding:22px}.cover-actions{gap:.3rem 1.05rem}}
+@media(max-width:520px){#stage:has(#cover:not([hidden])){min-height:clamp(290px,76vw,355px)}.titleblock{max-width:100%}.cover-actions a{font-size:14px}.buttons{gap:.3em;flex-wrap:wrap}}
