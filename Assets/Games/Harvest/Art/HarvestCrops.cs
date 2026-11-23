@@ -47,8 +47,45 @@ internal sealed class HarvestCrops
                 case 5: Corn(p,index);break;
                 case 6: Cabbage(p,index);break;
                 case 7: Carrot(p,index);break;
+                default: Specialty(p,index,crop);break;
             }
         }
+    }
+    void Specialty(Vector3 p,int k,int type)
+    {
+        float s=scale;
+        if(type==8||type==15){
+            for(int i=0;i<4;i++){Vector3 baseP=p+At((i-1.5f)*.072f,0,Mathf.Sin(i*2+k)*.065f);
+                float h=(.42f+i*.052f)*s;
+                Stem(baseP,baseP+Vector3.up*h,.035f,type==8?"91AB69":"E4DBC5");
+                if(type==8){FruitBlob(baseP+Vector3.up*h,At(.046f,.091f,.046f)*s,"81956D",i);}
+                else{m.Ink("70966D",Fruit);m.Leaf(baseP+Vector3.up*h*.65f,.38f*s,.04f,i*88+k,1.24f);}
+            } return;
+        }
+        if(type==13){
+            for(int i=0;i<5;i++){var root=p+At(Mathf.Cos(i*2.4f)*.14f,0,Mathf.Sin(i*2.4f)*.14f);
+                float h=(.13f+.025f*(i%3))*s;Stem(root,root+Vector3.up*h,.037f*s,"D7C5A2");
+                FruitBlob(root+Vector3.up*h,At(.115f,.049f,.112f)*s,"94735A",i,10);
+                for(int n=0;n<3;n++)Flower(root+At(.032f*Mathf.Cos(n*2),h+.036f*s,.036f*Mathf.Sin(n*2)),.021f*s,"D5B289",n);
+            } return;
+        }
+        if(type==10||type==11){
+            Vector3 top=p+Vector3.up*.62f*s;Stem(p,top,.026f*s,"648352");
+            for(int n=0;n<4;n++){
+                float a=(n*91+k*32)*Mathf.Deg2Rad;Vector3 mid=Vector3.Lerp(p,top,.36f+n*.145f);
+                var end=mid+At(Mathf.Cos(a)*.23f,.075f,Mathf.Sin(a)*.23f)*s;
+                Stem(mid,end,.019f*s,"668754");m.Ink("6E985B",Fruit);m.Leaf(end,.28f*s,.076f*s,a*Mathf.Rad2Deg,.52f);
+                if(stage<2)Flower(end,.034f,"D4A9CF",n);
+                else{var fruit=end-Vector3.up*.075f*s;
+                    FruitBlob(fruit,At(type==10?.065f:.081f,.118f,.077f)*s,type==10?"746487":(n%2==0?"D08A47":"C65C49"),n);
+                    Rosette(end,.051f*s,.019f,4,n,"75945F","88A16A",.1f);}
+            } return;
+        }
+        bool beet=type==14;string a1=beet?"7B664F":type==12?"839661":"72994D",a2=beet?"8B966C":"9CAB67";
+        Rosette(p+Vector3.up*.08f*s,type==12?.44f*s:.31f*s,.085f*s,7,k,a1,a2,type==12?.30f:1.03f);
+        if(stage<2)return;
+        if(type==12){for(int n=0;n<3;n++)FruitBlob(p+At(n*.055f-.06f,.04f,n*.026f),At(.098f,.069f,.060f)*s,"A27873",n);}
+        else FruitBlob(p+Vector3.up*.055f,At(.106f,.105f,.102f)*s,beet?"975066":"C76878",k,10);
     }
     void Rosette(Vector3 p,float length,float width,int number,int seed,string a,string b,float lift=.72f)
     {

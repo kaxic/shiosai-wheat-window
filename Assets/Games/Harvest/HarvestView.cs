@@ -25,7 +25,9 @@ public sealed class HarvestView : MonoBehaviour
     readonly MeshRenderer[] smoke=new MeshRenderer[6];
     readonly MeshFilter[] meals=new MeshFilter[3];
     Transform garden,owner,focus,can,water;
-    MeshFilter decoration;
+    MeshFilter decoration, scenery, grounding;
+    Transform wheel;
+    int field=-1;
     Material paint,wet,wash,rain;
     MaterialPropertyBlock opacity;
     Camera lens;
@@ -45,6 +47,7 @@ public sealed class HarvestView : MonoBehaviour
         {
             Refresh(g);version=g.MapVersion;
         }
+        if(field==1)wheel.localRotation=Quaternion.AngleAxis(-time*24,Vector3.forward);
         time+=Mathf.Min(Time.unscaledDeltaTime,.06f);
         float goalDusk=g.Mode==HarvestMode.Sleep?.82f:g.Mode==HarvestMode.Service?.22f:.025f*(g.Day%4);
         dusk=Mathf.MoveTowards(dusk,goalDusk,Time.unscaledDeltaTime*.78f);
@@ -94,8 +97,8 @@ public sealed class HarvestView : MonoBehaviour
         garden=Group("Wheat Window garden",transform);opacity=new MaterialPropertyBlock();
         const string root="Harvest/Art/";
         paint=new Material(Resources.Load<Shader>(root+"FarmPaint")){name="Garden paints"};
-        string[] fields={"_Grass","_Soil","_Wood","_Roof","_Plaster","_Stone"};
-        string[] images={"Clover","GardenLoam","Chestnut","ClayTile","LimeWash","Courtyard"};
+        string[] fields={"_Grass","_Soil","_Wood","_Roof","_Plaster","_Stone","_Grain"};
+        string[] images={"Clover","GardenLoam","Chestnut","ClayTile","LimeWash","Courtyard","FieldGrain"};
         for(int i=0;i<fields.Length;i++)paint.SetTexture(fields[i],Resources.Load<Texture2D>(root+images[i]));
         wet=new Material(paint){name="Watered loam"};wet.SetFloat("_Damp",1);
         wash=new Material(Resources.Load<Shader>(root+"FarmWash")){name="Soft shadows and smoke"};
@@ -107,8 +110,9 @@ public sealed class HarvestView : MonoBehaviour
         sun=Group("Window light",garden).gameObject.AddComponent<Light>();sun.type=LightType.Directional;
         sun.transform.rotation=Quaternion.LookRotation(At(.48f,-.83f,.44f));sun.shadows=LightShadows.Soft;sun.shadowStrength=.71f;
         sun.shadowNormalBias=.22f;sun.color=new Color(1,.92f,.81f);sun.intensity=1.12f;
-        Draw("Kitchen garden and cutaway cottage",garden,Cache("Homestead",m=>new HarvestHomestead(m).Build()),paint);
-        Draw("Grounding",garden,Cache("Courtyard contact",StaticShadows),wash);
+        scenery=Draw("Kitchen garden and cutaway cottage",garden,Cache("Homestead",m=>new HarvestHomestead(m).Build()),paint);
+        grounding=Draw("Grounding",garden,Cache("Courtyard contact",StaticShadows),wash);
+        wheel=Draw("Terrace water wheel",garden,Cache("Mill wheel",HarvestTerrace.Wheel),paint).transform;wheel.localPosition=HarvestTerrace.WheelHub;
         decoration=Draw("Seasonal orchard",garden,null,paint);
         for(int i=0;i<beds.Length;i++)
         {
@@ -164,6 +168,14 @@ public sealed class HarvestView : MonoBehaviour
     }
     void Refresh(HarvestGame g)
     {
+        if(field!=g.Field){
+            field=g.Field;wheel.gameObject.SetActive(field==1);
+            scenery.sharedMesh=field==0?Cache("Homestead",m=>new HarvestHomestead(m).Build()):Cache("Mill terrace",HarvestTerrace.Build);
+            grounding.gameObject.SetActive(field==0);decoration.gameObject.SetActive(field==0);
+            foreach(var customer in guests)customer.gameObject.SetActive(field==0);
+            foreach(var meal in meals)meal.gameObject.SetActive(field==0);
+            foreach(var cloud in vapor)cloud.gameObject.SetActive(field==0);
+        }
         for(int i=0;i<beds.Length;i++)
         {
             var b=beds[i];int id=g.PlotCrop(i);
@@ -186,7 +198,7 @@ public sealed class HarvestView : MonoBehaviour
             if(!customPlants.TryGetValue(resource,out var prefab))
             {prefab=Resources.Load<GameObject>(resource);customPlants.Add(resource,prefab);}
             if(prefab){b.custom=Instantiate(prefab,b.root).transform;continue;}
-            int type=Mathf.Clamp(g.PlotArtKind(i),0,7);
+            int type=Mathf.Clamp(g.PlotArtKind(i),0,15);
             b.plant.sharedMesh=Cache(key+" stage "+stage,m=>new HarvestCrops(m).Build(type,stage));
         }
         if(season!=g.Season)
@@ -222,6 +234,7 @@ public sealed class HarvestView : MonoBehaviour
     }
     float FloorHeight(Vector2 p)
     {
+        if(field==1)return .025f;
         if(p.x>-.19f&&p.x<8.23f&&p.y>1.40f&&p.y<5.45f)return .288f;
         if(p.x>2.02f&&p.x<9.32f&&p.y> -4.3f&&p.y<.81f)return .072f;
         foreach(var b in beds)if(Mathf.Abs(p.x-b.center.x)<.80f&&Mathf.Abs(p.y-b.center.y)<.73f)return .16f;
@@ -236,6 +249,7 @@ public sealed class HarvestView : MonoBehaviour
             if(new Bounds(center,size).IntersectRay(ray,out float at)&&at>=0&&at<nearest){best=id;nearest=at;}
         }
         for(int i=0;i<beds.Length;i++){var b=beds[i];bounds(i,At(b.center.x,b.pickHeight*.5f,b.center.y),At(1.70f,b.pickHeight,1.52f));}
+        if(field==1)return best;
         bounds(12,At(4.20f,.70f,2.79f),At(2.04f,1.28f,.95f));bounds(12,At(4.57f,.93f,4.40f),At(1.80f,1.65f,1.29f));
         bounds(13,At(5.60f,.55f,-.15f),At(1.58f,1.05f,.85f));
         foreach(var table in HarvestHomestead.Tables)bounds(13,At(table.x,.60f,table.y+.21f),At(1.08f,1.17f,1.55f));

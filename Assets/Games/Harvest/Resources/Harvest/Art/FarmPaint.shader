@@ -1,5 +1,6 @@
 Shader "Harvest/Farmhouse Gouache" {
  Properties {
+  [NoScaleOffset] _Grain("Field surface detail",2D)="gray"{}
   [NoScaleOffset] _Grass("Meadow clover",2D)="gray"{}
   [NoScaleOffset] _Soil("Garden loam",2D)="gray"{}
   [NoScaleOffset] _Wood("Chestnut",2D)="gray"{}
@@ -18,7 +19,7 @@ Shader "Harvest/Farmhouse Gouache" {
   #pragma multi_compile_fwdbase
   #include "UnityCG.cginc"
   #include "AutoLight.cginc"
-  sampler2D _Grass,_Soil,_Wood,_Roof,_Plaster,_Stone;half _Damp;float4 _Sky;
+  sampler2D _Grain; sampler2D _Grass,_Soil,_Wood,_Roof,_Plaster,_Stone;half _Damp;float4 _Sky;
   struct app {float4 vertex:POSITION;float3 normal:NORMAL;float4 uv:TEXCOORD0;half4 color:COLOR;};
   struct px {float4 pos:SV_POSITION;float4 uv:TEXCOORD0;float3 world:TEXCOORD1;half3 norm:TEXCOORD2;half3 color:COLOR;SHADOW_COORDS(3)};
   px vert(app v){px o;o.pos=UnityObjectToClipPos(v.vertex);o.world=mul(unity_ObjectToWorld,v.vertex).xyz;o.uv=v.uv;o.norm=UnityObjectToWorldNormal(v.normal);o.color=v.color.rgb;TRANSFER_SHADOW(o);return o;}
@@ -52,6 +53,11 @@ Shader "Harvest/Farmhouse Gouache" {
     else if(_Sky.x>1.5)c=lerp(c,half3(.84,.57,.29),.64);
    }
    else if(t>9.5){float r=sin(uv.y*5+sin(uv.x*2+_Time.y*.3)+_Time.y*.67);paper=half3(.11,.12,.10)*smoothstep(.88,1,r);}
+   half3 relief=tex2D(_Grain,uv*.94).rgb-half3(.54,.50,.55);
+   if(t>1.5&&t<2.5)paper+=relief.r*.16+relief.g*.14;
+   else if(t>.5&&t<1.5)paper+=relief.g*half3(.058,.095,.045);
+   else if(t>4.5&&t<6.5)paper+=relief.b*.12;
+   else if(t>8.5&&t<9.5)paper+=relief.g*.06+saturate(dot(n,normalize(half3(-.45,.81,-.43))))*.022;
    float sun=saturate(dot(n,normalize(half3(-.48,.83,-.44))));
    float sky=n.y*.5+.5;
    float shadow=SHADOW_ATTENUATION(i);

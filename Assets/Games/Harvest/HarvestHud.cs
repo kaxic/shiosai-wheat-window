@@ -63,6 +63,7 @@ public sealed partial class HarvestHud
         Label(game.Reputation.ToString("N0"), wallet.x + 134, y + 21, 83, 27, 18, Ink);
         if (Hit(wallet)) game.Open(HarvestMode.Market);
 
+        if(Shortcut(new Rect(x,y+129,201,36),"T",game.FieldName+"　⇄"))game.TravelField();
         float wave = game.H - 52;
         float bw = 94;
         for (int i = 0; i < FieldModes.Length; i++)

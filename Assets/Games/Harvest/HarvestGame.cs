@@ -8,7 +8,7 @@ public sealed class HarvestGame : StudioGame
     static readonly Vector2[] Stations = {new Vector2(4.2f,2.2f),new Vector2(5.6f,-.4f),new Vector2(-6.2f,3.9f),new Vector2(1.1f,3.8f),new Vector2(-.1f,-3.8f)};
     static readonly HarvestMode[] Places = {HarvestMode.Kitchen,HarvestMode.Service,HarvestMode.Market,HarvestMode.Sleep,HarvestMode.Festival};
     static readonly string[] PlaceNames = {"厨房で調理","お客様に配膳","売店を開く","翌日を迎える","品評会に出品"};
-    static readonly string[] OriginalCrops={"wheat","turnip","tomato","bean","pumpkin","corn","cabbage","carrot"};
+    static readonly string[] OriginalCrops={"wheat","turnip","tomato","bean","pumpkin","corn","cabbage","carrot","asparagus","radish","eggplant","pepper","sweet_potato","shiitake","beet","leek"};
     HarvestCatalog catalog;
     HarvestFarm farm;
     HarvestView view;
@@ -37,6 +37,15 @@ public sealed class HarvestGame : StudioGame
     public int SelectedCrop => farm.Selected;
     public int Selection {get;private set;}
     public int MapVersion => epoch + farm.Version;
+    public int Field=>S.field;
+    public string FieldName=>Field==0?"麦窓の前庭":"水車の段丘園";
+    int PlotSlot(int local)=>local+Field*HarvestFarm.BedsPerField;
+    public void TravelField()
+    {
+        if(Mode!=HarvestMode.Farm)return;
+        S.field=1-S.field;S.hero=new Vector2(-1.4f,-3.1f);destination=-1;epoch++;
+        Motion=0;Tone(1);Notice(FieldName+"に到着"+(Field==1?"　偶数日の朝は水路から自動で灌水":""));SaveCheckpoint();
+    }
     public Vector2 Hero => S.hero;
     public Vector2 Facing => S.facing;
     public float Motion {get;private set;}
@@ -73,21 +82,21 @@ public sealed class HarvestGame : StudioGame
             int i=PlotCrop(site);
             if(i<0)return $"E　{Crops[SelectedCrop].name}をまく（種 {SeedStock(SelectedCrop)}）";
             if(Ripe(site))return "E　"+Crops[i].name+"を収穫";
-            if(Watered(site))return $"水やり済み　{Crops[i].name}・あと{S.plots[site].duration-S.plots[site].age}日";
+            if(Watered(site))return $"水やり済み　{Crops[i].name}・あと{S.plots[PlotSlot(site)].duration-S.plots[PlotSlot(site)].age}日";
             return "E　"+Crops[i].name+"に水をやる";
         }
     }
     public Vector2 PlotPosition(int i)=>new Vector2(-6.3f+i%4*1.9f,-2.8f+i/4*2.0f);
     public Vector2 StationPosition(int i)=>Stations[i];
-    public int PlotCrop(int i)=>farm.PlotCrop(i);
+    public int PlotCrop(int i)=>farm.PlotCrop(PlotSlot(i));
     public int PlotArtKind(int i)
     {
         int crop=PlotCrop(i);if(crop<0)return -1;
         int art=Array.IndexOf(OriginalCrops,Crops[crop].id);return art>=0?art:Crops[crop].season*2;
     }
-    public float Growth(int i)=>PlotCrop(i)<0 ? 0 : Mathf.Clamp01(S.plots[i].age/(float)Math.Max(1,S.plots[i].duration));
-    public bool Ripe(int i)=>farm.Ripe(i);
-    public bool Watered(int i)=>S.plots[i].watered;
+    public float Growth(int i)=>PlotCrop(i)<0 ? 0 : Mathf.Clamp01(S.plots[PlotSlot(i)].age/(float)Math.Max(1,S.plots[PlotSlot(i)].duration));
+    public bool Ripe(int i)=>farm.Ripe(PlotSlot(i));
+    public bool Watered(int i)=>S.plots[PlotSlot(i)].watered;
     public int SeedStock(int i)=>farm.Seeds(i);
     public int Produce(int i)=>farm.Produce(i);
     public int FineProduce(int i)=>farm.Fine(i);
@@ -141,7 +150,7 @@ public sealed class HarvestGame : StudioGame
     int Nearest(Vector2 p,float range)
     {
         float best=range*range;int result=-1;
-        for(int i=0;i<12+Stations.Length;i++)
+        for(int i=0;i<12+(Field==0?Stations.Length:0);i++)
         {
             Vector2 world=i<12?PlotPosition(i):StationPosition(i-12);float d=(p-world).sqrMagnitude;
             if(d>=best)continue;best=d;result=i;
@@ -176,7 +185,7 @@ public sealed class HarvestGame : StudioGame
     {
         if(site>=12){Open(Places[site-12]);return;}
         if(site<0){Notice("畑か設備の前へ移動しよう");return;}
-        Feedback(farm.Tend(site));
+        Feedback(farm.Tend(PlotSlot(site)));
     }
     public void PickSeed(int i){if(Mode==HarvestMode.Seeds)Feedback(farm.PickSeed(i));}
     public void StartCooking(int i)
@@ -212,6 +221,7 @@ public sealed class HarvestGame : StudioGame
         float dt=Mathf.Min(.06f,Time.deltaTime);
         if(Mode==HarvestMode.Farm)
         {
+            if(Input.GetKeyDown(KeyCode.T)){TravelField();return;}
             if(Input.GetKeyDown(KeyCode.P)){Open(HarvestMode.Seeds);return;}
             if(Input.GetKeyDown(KeyCode.K)){Open(HarvestMode.Kitchen);return;}
             if(Input.GetKeyDown(KeyCode.O)){Open(HarvestMode.Service);return;}

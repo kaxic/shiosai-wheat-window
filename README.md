@@ -15,3 +15,5 @@
 Unity Hubでこのフォルダーを追加し、Unity 6000.3.28f1で `Assets/Games/Harvest/Harvest.unity` を開いて再生します。
 
 Web版は Web Build Support を追加し、Unity の **Shiosai → Build browser game** から再ビルドできます。出力先は `docs` です。
+
+[拡張版の内容](更新内容.md) ・ [Windows版をダウンロード](https://github.com/kaxic/shiosai-wheat-window/releases/latest)

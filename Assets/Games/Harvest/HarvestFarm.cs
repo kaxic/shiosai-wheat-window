@@ -51,7 +51,8 @@ public enum HarvestMode { Farm, Seeds, Kitchen, Cooking, Service, Market, Ledger
     public HarvestMode mode;
     public Vector2 hero = new Vector2(0, -1.2f), facing = Vector2.up;
     public int[] upgrades = new int[3];
-    public HarvestPlot[] plots = new HarvestPlot[12];
+    public int field;
+    public HarvestPlot[] plots = new HarvestPlot[HarvestFarm.BedCount];
     public List<HarvestStoredPlot> storedPlots = new List<HarvestStoredPlot>();
     public List<HarvestStock> stock = new List<HarvestStock>();
     public List<HarvestDish> dishes = new List<HarvestDish>();
@@ -61,6 +62,7 @@ public enum HarvestMode { Farm, Seeds, Kitchen, Cooking, Service, Market, Ledger
 
 public sealed class HarvestFarm
 {
+    public const int BedsPerField=12, BedCount=24;
     public static readonly string[] Tools = {"じょうろ","銅の調理台","食堂の客席"};
     public static readonly string[] ToolNotes = {"周囲の区画も同時に水やり。段階ごとに範囲が1区画広がる。","工程を精密に仕上げやすくなり、黄金の範囲が広がる。","配膳の売上が一皿につき3コインずつ増える。"};
     public static readonly string[] Techniques = {"切る","煮る","焼く","和える"};
@@ -97,7 +99,8 @@ public sealed class HarvestFarm
         S.day = Mathf.Max(1,S.day); S.coins = Mathf.Max(0,S.coins);
         if (S.upgrades == null || S.upgrades.Length != 3) Array.Resize(ref S.upgrades,3);
         for (int i=0;i<3;i++) S.upgrades[i] = Mathf.Clamp(S.upgrades[i],0,2);
-        if (S.plots == null || S.plots.Length < 12) Array.Resize(ref S.plots,12);
+        S.field=Mathf.Clamp(S.field,0,1);
+        if (S.plots == null || S.plots.Length < BedCount) Array.Resize(ref S.plots,BedCount);
         for (int i=0;i<S.plots.Length;i++) S.plots[i] ??= new HarvestPlot();
         S.stock ??= new List<HarvestStock>(); S.dishes ??= new List<HarvestDish>();
         foreach (var c in C.crops) Stock(c.id);
@@ -141,7 +144,7 @@ public sealed class HarvestFarm
     void ReconcilePlots()
     {
         S.storedPlots ??= new List<HarvestStoredPlot>();
-        for(int i=0;i<12;i++)
+        for(int i=0;i<BedCount;i++)
         {
             var p=S.plots[i];
             if(string.IsNullOrEmpty(p.cropId) || C.CropIndex(p.cropId)>=0)continue;
@@ -154,10 +157,10 @@ public sealed class HarvestFarm
             if(item?.plant==null || string.IsNullOrEmpty(item.plant.cropId)){S.storedPlots.RemoveAt(i);continue;}
             if(C.CropIndex(item.plant.cropId)<0){i++;continue;}
             int target=item.originalIndex;
-            if(target<0 || target>=12 || !string.IsNullOrEmpty(S.plots[target].cropId))
+            if(target<0 || target>=BedCount || !string.IsNullOrEmpty(S.plots[target].cropId))
             {
                 target=-1;
-                for(int j=0;j<12;j++)if(string.IsNullOrEmpty(S.plots[j].cropId)){target=j;break;}
+                for(int j=0;j<BedCount;j++)if(string.IsNullOrEmpty(S.plots[j].cropId)){target=j;break;}
             }
             if(target<0){i++;continue;}
             S.plots[target]=item.plant;S.storedPlots.RemoveAt(i);
@@ -196,7 +199,7 @@ public sealed class HarvestFarm
     }
     public bool Tend(int i)
     {
-        if (S.mode!=HarvestMode.Farm || i<0 || i>=12) return false;
+        if (S.mode!=HarvestMode.Farm || i<0 || i>=BedCount) return false;
         var p=S.plots[i]; int crop=PlotCrop(i);
         if (crop < 0)
         {
@@ -217,10 +220,10 @@ public sealed class HarvestFarm
         {
             if (p.watered) {S.log="今日の水やりは済んでいます。就寝すると成長します。";return false;}
             int count=0;
-            for(int j=0;j<12;j++)
+            for(int j=0;j<BedCount;j++)
             {
                 var bed=S.plots[j];
-                if (PlotCrop(j)<0 || Ripe(j) || bed.watered || Math.Abs(i%4-j%4)+Math.Abs(i/4-j/4)>S.upgrades[0]) continue;
+                if (PlotCrop(j)<0 || Ripe(j) || bed.watered || i/BedsPerField!=j/BedsPerField || Math.Abs(i%4-j%4)+Math.Abs(i/4-j/4)>S.upgrades[0]) continue;
                 bed.watered=true; count++;
             }
             S.log=$"{count}区画に水をやった。";
@@ -362,13 +365,13 @@ public sealed class HarvestFarm
     {
         if(S.mode!=HarvestMode.Sleep || S.day==int.MaxValue)return false;
         int oldSeason=Season,oldYear=Year;
-        for(int i=0;i<12;i++)
+        for(int i=0;i<BedCount;i++)
         {
             var p=S.plots[i];
             if(PlotCrop(i)>=0 && !Ripe(i)){if(p.watered)p.age++;else p.dryNights++;}
         }
         S.day++;
-        for(int i=0;i<12;i++)S.plots[i].watered=Weather==1 && PlotCrop(i)>=0;
+        for(int i=0;i<BedCount;i++)S.plots[i].watered=(Weather==1 || (i>=BedsPerField && S.day%2==0)) && PlotCrop(i)>=0;
         if(Season!=oldSeason)S.seasonServed=0;
         if(Year!=oldYear)S.yearStamps=0;
         Stock(Almanac.starter).seeds++;

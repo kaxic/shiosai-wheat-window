@@ -3,16 +3,16 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#15272a"><title>麦窓食堂 | 潮彩作品集</title>
-  <link rel="icon" href="icon.png"><link rel="stylesheet" href="player.css">
+  <link rel="icon" href="icon.png"><link rel="stylesheet" href="player.css"><link rel="stylesheet" href="touch.css"><script defer src="touch.js"></script>
 </head>
 <body>
 <header><span class="imprint">潮彩作品集</span><a href="https://github.com/kaxic/shiosai-wheat-window">GitHub ↗</a></header>
 <main>
   <section id="stage" aria-label="ゲーム画面">
-    <canvas id="game" width="1280" height="720" tabindex="0" aria-label="麦窓食堂のゲーム画面"></canvas>
+    <canvas id="game" data-game="Harvest" width="1280" height="720" tabindex="0" aria-label="麦窓食堂のゲーム画面"></canvas>
     <div id="cover">
-      <div class="titleblock"><p class="genre">農業と料理</p><h1>麦窓食堂</h1><p class="intro">窓辺の畑から、季節のひと皿を。
-種をまき、小さな食堂に今日の料理を届けましょう。</p>
+      <div class="titleblock"><p class="genre">農業と料理</p><h1>麦窓食堂</h1><p class="intro">水車が回る段丘園と麦窓の前庭を行き来し、十六種の作物を育てよう。
+三十二品の献立で、四季の食卓を彩ります。</p>
         <button id="launch">ゲームを開始 <span aria-hidden="true">›</span></button>
         <div id="status" role="status" aria-live="polite"></div><progress id="meter" max="1" value="0" hidden></progress>
       </div>
@@ -22,6 +22,7 @@
   <dialog id="guide"><div class="dialogtop"><h2>操作方法</h2><button class="close">閉じる</button></div><p>キーボードとマウスで遊べます。進行はこのブラウザーに保存されます。</p><div id="controls">WASD・矢印で歩く。Pで種を選び、畑の前でEを押して種まき・水やり・収穫。Nで就寝すると翌日になります。
 
 K 厨房　O 配膳　M 売店　B 帳簿　G 品評会。厨房でレシピを選び、表示された工程を黄金の帯に合わせて仕上げます。
+Tで前庭と水車の段丘園を移動。段丘園は偶数日の朝に自動で水が入ります。
 
 Escで休憩、F1でゲーム内ヘルプ、F5で保存、F12で写真を撮れます。</div></dialog>
   <dialog id="album"><div class="dialogtop"><h2>写真の保存</h2><button class="close">閉じる</button></div><div id="prints"></div></dialog>
@@ -35,7 +36,7 @@ const meter=document.getElementById('meter');
 let instance=null;
 const build='Build/';
 const config={
-  dataUrl:build+'Browser.data.unityweb',frameworkUrl:build+'Browser.framework.js.unityweb',codeUrl:build+'Browser.wasm.unityweb',
+  dataUrl:build+'e1b92da824c4f5e2590a433dc0cc6f1e.data.unityweb',frameworkUrl:build+'283b2df27b8a0be2ead064026c5523df.framework.js.unityweb',codeUrl:build+'bdf841937a845427b821641032162546.wasm.unityweb',
   streamingAssetsUrl:'StreamingAssets',companyName:'Shiosai Works',productName:'The Wheat Window',productVersion:'1.0',
   devicePixelRatio:Math.min(1.5,window.devicePixelRatio||1),
   showBanner:function(message,type){ if(type==='error'){statusLine.textContent='読み込みに失敗しました。ページを再読み込みしてください。';console.error(message);} }
@@ -43,7 +44,7 @@ const config={
 async function startGame(){
   launchButton.disabled=true; statusLine.textContent='ゲームを読み込んでいます…';meter.hidden=false;
   try{
-    if(typeof createUnityInstance!=='function')await new Promise((resolve,reject)=>{const s=document.createElement('script'); s.src=build+'Browser.loader.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});
+    if(typeof createUnityInstance!=='function')await new Promise((resolve,reject)=>{const s=document.createElement('script'); s.src=build+'c8bbf6d0dc27c6dc16fd13ac1d998667.loader.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});
     instance=await createUnityInstance(canvas,config,value=>{meter.value=value;statusLine.textContent='読み込み中　'+Math.round(100*value)+'%';});
     cover.hidden=true;canvas.focus();document.body.classList.add('playing');
   }catch(e){statusLine.textContent='ゲームを開始できませんでした。WebGL 2に対応したブラウザーで再試行してください。';meter.hidden=true;launchButton.disabled=false;console.error(e);}

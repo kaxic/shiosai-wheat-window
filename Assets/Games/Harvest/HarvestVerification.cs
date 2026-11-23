@@ -6,6 +6,7 @@ public static class HarvestVerification
     public static string Showcase {get;private set;}
     public static HarvestRecord Run(HarvestCatalog catalog)
     {
+        TestTerrace(catalog);
         TestKitchen(catalog);TestSeasonsAndRecovery(catalog);TestCatalogEdits(catalog);
         var farm=new HarvestFarm(catalog,new HarvestRecord());
         int score=-1,completedYear=0,visits=0;
@@ -26,14 +27,15 @@ public static class HarvestVerification
                 if(value>score){score=value;Showcase=JsonUtility.ToJson(farm.S);}
             }
             Snapshot();
-            for(int plot=0;plot<12;plot++)
+            for(int plot=0;plot<HarvestFarm.BedCount;plot++)
             {
                 if(farm.Ripe(plot))Check(farm.Tend(plot),"harvest");
                 if(farm.PlotCrop(plot)<0)
                 {
                     // Rotate crops and sow some on later days to keep the field in different stages.
-                    if(plot>=8 && (d+plot)%3!=0)continue;
+                    if(plot>=8 && plot<12 && (d+plot)%3!=0)continue;
                     int crop=plot%2==0?a:b;
+                    if(plot>=12 && catalog.crops.Length>=16)crop=8+(plot-12+d)%8;
                     if(farm.Seeds(crop)==0 && farm.S.coins>=catalog.crops[crop].seedPrice+3)farm.BuySeed(crop);
                     if(farm.Seeds(crop)==0)continue;
                     Check(farm.PickSeed(crop) && farm.Tend(plot),"plant purchased or gifted seed");
@@ -75,6 +77,8 @@ public static class HarvestVerification
             if(d==35)break;
             farm.S.mode=HarvestMode.Sleep; Check(farm.Sleep() && !farm.Sleep(),"explicit sleep required for advancing time");
         }
+        var fieldCopy=Restore(farm);
+        Check(fieldCopy.S.plots.Length>=24 && fieldCopy.S.plots[12]!=null,"terrace beds survive reload");
         Check(completedYear==4 && farm.Year==2 && farm.FestivalQty==2 && farm.RequiredServings==4 &&
             farm.S.allStamps==15 && farm.S.awards==5 && farm.S.yearStamps==1,"all first-year reviews and return festival");
         Check(farm.MasteredCount==catalog.recipes.Length && farm.S.totalServed==visits && farm.S.reputation>visits,"published menu and reputation");
@@ -86,6 +90,24 @@ public static class HarvestVerification
         return final.S;
     }
 
+    static void TestTerrace(HarvestCatalog catalog)
+    {
+        var f=new HarvestFarm(catalog,new HarvestRecord());
+        int target=HarvestFarm.BedsPerField;
+        Check(f.Tend(target) && f.Tend(target),"plant and water a terrace bed");
+        string planted=f.S.plots[target].cropId;
+        int firstAge=f.S.plots[0].age;
+        f.S.field=0;f.S.mode=HarvestMode.Sleep;Check(f.Sleep(),"grow both fields");
+        var restored=Restore(f);
+        Check(restored.S.plots[target].cropId==planted && restored.S.plots[target].age==1 &&
+              restored.S.plots[target].watered && restored.S.plots[0].age==firstAge,
+              "terrace grows away from home and its channel irrigates on even mornings");
+        var v1=JsonUtility.FromJson<HarvestRecord>(JsonUtility.ToJson(f.S));
+        Array.Resize(ref v1.plots,HarvestFarm.BedsPerField);v1.field=0;
+        var expanded=new HarvestFarm(catalog,v1);
+        Check(expanded.S.plots.Length==HarvestFarm.BedCount && expanded.S.plots[0].age==firstAge
+              && expanded.PlotCrop(target)<0,"old twelve-bed save keeps the first field");
+    }
     static void TestKitchen(HarvestCatalog c)
     {
         var f=new HarvestFarm(c,new HarvestRecord());

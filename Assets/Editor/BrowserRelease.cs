@@ -18,6 +18,7 @@ public static class BrowserRelease
         PlayerSettings.WebGL.template = "PROJECT:Shiosai";
         PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Gzip;
         PlayerSettings.WebGL.decompressionFallback = true;
+        PlayerSettings.WebGL.nameFilesAsHashes = true;
         PlayerSettings.WebGL.threadsSupport = false;
         PlayerSettings.WebGL.dataCaching = false;
         PlayerSettings.colorSpace = ColorSpace.Gamma;
@@ -32,12 +33,19 @@ public static class BrowserRelease
             scenes = scenes, locationPathName = output, target = BuildTarget.WebGL, options = BuildOptions.None
         });
         if (report.summary.result != BuildResult.Succeeded) throw new InvalidOperationException("Web build failed");
+        string html = File.ReadAllText(Path.Combine(output, "index.html"));
         foreach (var source in Directory.EnumerateFiles(output, "*", SearchOption.AllDirectories))
         {
             var relative = Path.GetRelativePath(output, source);
+            if (Path.GetDirectoryName(relative) == "Build" && !html.Contains(Path.GetFileName(source))) continue;
             var destination = Path.Combine("docs", relative);
             Directory.CreateDirectory(Path.GetDirectoryName(destination));
             File.Copy(source, destination, true);
+        }
+        foreach (var old in new[] { "Browser.loader.js", "Browser.data.unityweb", "Browser.framework.js.unityweb", "Browser.wasm.unityweb" })
+        {
+            string file = Path.Combine("docs", "Build", old);
+            if (!html.Contains(old) && File.Exists(file)) File.Delete(file);
         }
         File.WriteAllText("docs/.nojekyll", "");
         Debug.Log("SHIOSAI_WEB_BUILD_OK " + scenes[0]);
