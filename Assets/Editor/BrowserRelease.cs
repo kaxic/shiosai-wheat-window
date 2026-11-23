@@ -42,10 +42,11 @@ public static class BrowserRelease
             Directory.CreateDirectory(Path.GetDirectoryName(destination));
             File.Copy(source, destination, true);
         }
-        foreach (var old in new[] { "Browser.loader.js", "Browser.data.unityweb", "Browser.framework.js.unityweb", "Browser.wasm.unityweb" })
+        foreach (var file in Directory.EnumerateFiles(Path.Combine("docs", "Build")))
         {
-            string file = Path.Combine("docs", "Build", old);
-            if (!html.Contains(old) && File.Exists(file)) File.Delete(file);
+            string name = Path.GetFileName(file);
+            bool generated = System.Text.RegularExpressions.Regex.IsMatch(name, @"^(Browser|[0-9a-f]{32})\.(loader\.js|(wasm|framework\.js|data)\.unityweb)$");
+            if (generated && !html.Contains(name)) File.Delete(file);
         }
         File.WriteAllText("docs/.nojekyll", "");
         Debug.Log("SHIOSAI_WEB_BUILD_OK " + scenes[0]);

@@ -2,23 +2,23 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#15272a"><title>麦窓食堂 | 潮彩作品集</title>
+  <meta name="theme-color" content="#15272a"><title>D 畑と料理の食堂経営 | 潮彩作品集</title>
   <link rel="icon" href="icon.png"><link rel="stylesheet" href="player.css"><link rel="stylesheet" href="touch.css"><script defer src="touch.js"></script>
 </head>
 <body>
-<header><span class="imprint">潮彩作品集</span><a href="https://github.com/kaxic/shiosai-wheat-window">GitHub ↗</a></header>
+<header><a class="imprint" id="library-home" href="https://kaxic.github.io/shiosai-game-library/#D"><span aria-hidden="true">← </span>ゲーム一覧</a><span id="home-status" role="status"></span><a href="https://github.com/kaxic/shiosai-wheat-window">GitHub ↗</a></header>
 <main>
   <section id="stage" aria-label="ゲーム画面">
-    <canvas id="game" data-game="Harvest" width="1280" height="720" tabindex="0" aria-label="麦窓食堂のゲーム画面"></canvas>
+    <canvas id="game" data-game="Harvest" width="1280" height="720" tabindex="0" aria-label="D 畑と料理の食堂経営のゲーム画面"></canvas>
     <div id="cover">
-      <div class="titleblock"><p class="genre">農業と料理</p><h1>麦窓食堂</h1><p class="intro">水車が回る段丘園と麦窓の前庭を行き来し、十六種の作物を育てよう。
+      <div class="titleblock"><p class="genre">麦窓食堂</p><h1>D 畑と料理の食堂経営</h1><p class="intro">水車が回る段丘園と麦窓の前庭を行き来し、十六種の作物を育てよう。
 三十二品の献立で、四季の食卓を彩ります。</p>
         <button id="launch">ゲームを開始 <span aria-hidden="true">›</span></button>
         <div id="status" role="status" aria-live="polite"></div><progress id="meter" max="1" value="0" hidden></progress>
       </div>
     </div>
   </section>
-  <div class="bar"><span class="wordmark">麦窓食堂</span><div class="buttons"><button id="help">操作方法</button><button id="full">全画面</button><a id="demo" href="media/demo.mp4" hidden>プレイ映像 ▷</a></div></div>
+  <div class="bar"><span class="wordmark">D 畑と料理の食堂経営</span><div class="buttons"><button id="help">操作方法</button><button id="full">全画面</button><a id="demo" href="media/demo.mp4" hidden>プレイ映像 ▷</a></div></div>
   <dialog id="guide"><div class="dialogtop"><h2>操作方法</h2><button class="close">閉じる</button></div><p>キーボードとマウスで遊べます。進行はこのブラウザーに保存されます。</p><div id="controls">WASD・矢印で歩く。Pで種を選び、畑の前でEを押して種まき・水やり・収穫。Nで就寝すると翌日になります。
 
 K 厨房　O 配膳　M 売店　B 帳簿　G 品評会。厨房でレシピを選び、表示された工程を黄金の帯に合わせて仕上げます。
@@ -36,7 +36,7 @@ const meter=document.getElementById('meter');
 let instance=null;
 const build='Build/';
 const config={
-  dataUrl:build+'e1b92da824c4f5e2590a433dc0cc6f1e.data.unityweb',frameworkUrl:build+'283b2df27b8a0be2ead064026c5523df.framework.js.unityweb',codeUrl:build+'bdf841937a845427b821641032162546.wasm.unityweb',
+  dataUrl:build+'2cb6564465a026bcafa3f27b4e1bb6fd.data.unityweb',frameworkUrl:build+'d68dd3bf373852aa121b859b09127fa7.framework.js.unityweb',codeUrl:build+'60aee53351d14d777ae15e62f6f5e804.wasm.unityweb',
   streamingAssetsUrl:'StreamingAssets',companyName:'Shiosai Works',productName:'The Wheat Window',productVersion:'1.0',
   devicePixelRatio:Math.min(1.5,window.devicePixelRatio||1),
   showBanner:function(message,type){ if(type==='error'){statusLine.textContent='読み込みに失敗しました。ページを再読み込みしてください。';console.error(message);} }
@@ -44,12 +44,19 @@ const config={
 async function startGame(){
   launchButton.disabled=true; statusLine.textContent='ゲームを読み込んでいます…';meter.hidden=false;
   try{
-    if(typeof createUnityInstance!=='function')await new Promise((resolve,reject)=>{const s=document.createElement('script'); s.src=build+'c8bbf6d0dc27c6dc16fd13ac1d998667.loader.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});
+    if(typeof createUnityInstance!=='function')await new Promise((resolve,reject)=>{const s=document.createElement('script'); s.src=build+'1c9c61d147b365891c3ba9bf91867140.loader.js';s.onload=resolve;s.onerror=reject;document.head.appendChild(s);});
     instance=await createUnityInstance(canvas,config,value=>{meter.value=value;statusLine.textContent='読み込み中　'+Math.round(100*value)+'%';});
     cover.hidden=true;canvas.focus();document.body.classList.add('playing');
   }catch(e){statusLine.textContent='ゲームを開始できませんでした。WebGL 2に対応したブラウザーで再試行してください。';meter.hidden=true;launchButton.disabled=false;console.error(e);}
 }
 launchButton.addEventListener('click',startGame);
+document.getElementById('library-home').addEventListener('click',event=>{
+  if(!instance||event.button!==0||event.metaKey||event.ctrlKey||event.altKey||event.shiftKey)return;
+  event.preventDefault();
+  document.getElementById('home-status').textContent='保存してゲーム一覧へ戻ります…';
+  instance.SendMessage('ShiosaiLibraryNavigation','GoHome');
+});
+window.shiosaiHomeFailed=()=>{document.getElementById('home-status').textContent='保存に失敗しました。ゲーム一覧をもう一度押してください。';};
 document.getElementById('full').addEventListener('click',()=>{if(instance){instance.SetFullscreen(1);canvas.focus();}else document.getElementById('stage').requestFullscreen?.();});
 document.getElementById('help').addEventListener('click',()=>document.getElementById('guide').showModal());
 document.querySelectorAll('dialog .close').forEach(b=>b.onclick=()=>b.closest('dialog').close());

@@ -52,6 +52,7 @@ public abstract class StudioGame : MonoBehaviour
 
     void Awake()
     {
+        BrowserHome.Register(transform, QuitGame);
         Application.targetFrameRate=60;
         review=Argument("-studioReviewDir");
         slot=review!=null?1:Mathf.Clamp(PlayerPrefs.GetInt("slot-"+skin.key,1),1,3);
@@ -208,8 +209,14 @@ public abstract class StudioGame : MonoBehaviour
     {
         var full=new Rect(0,0,W,H);if(skin.cover)GUI.DrawTexture(full,skin.cover,ScaleMode.ScaleAndCrop);else Box(full,Ink);
         GUI.DrawTexture(full,veil);float x=W*.064f,y=H*.28f;
-        Box(new Rect(x,y,68,3),Accent);Label(new Rect(x,y+15,580,30),skin.english,19,Accent);
-        Label(new Rect(x-4,y+55,W*.72f,98),skin.title,skin.title.Length>8?53:64,Color.white,true);
+        Box(new Rect(x,y,68,3),Accent);
+        string series = string.IsNullOrWhiteSpace(skin.subtitle) ? skin.english : skin.subtitle+"　／　"+skin.english;
+        Label(new Rect(x,y+13,W*.84f,32),series,18,Accent);
+        float titleWidth=W*.86f;
+        int titleSize=Mathf.Clamp(Mathf.FloorToInt(titleWidth/Mathf.Max(1,skin.title.Length)),37,60);
+        var titleBox=new Rect(x-3,y+54,titleWidth,97);
+        Label(new Rect(titleBox.x+1.5f,titleBox.y+2,titleBox.width,titleBox.height),skin.title,titleSize,new Color(.05f,.08f,.10f,.84f),true);
+        Label(titleBox,skin.title,titleSize,Color.white,true);
         Label(new Rect(x,y+160,495,67),skin.introduction,18,Paper);
         Label(new Rect(x,y+230,103,31),"旅の記録",15,Paper);
         for(int i=1;i<=3;i++)

@@ -1,12 +1,14 @@
-# 麦窓食堂
+# D 畑と料理の食堂経営
+
+麦窓食堂
 
 朝の左手の畑には、もう収穫できる小麦があります。まず厨房を開き、手元の小麦で「窓辺の丸パン」を作ってみてください。最初の手順は「和える」、次は「焼く」。できた料理を配膳すると、次にまく種代を稼げます。
 
-**[ブラウザーで遊ぶ](https://kaxic.github.io/shiosai-wheat-window/)**
+**[ブラウザーで遊ぶ](https://kaxic.github.io/shiosai-wheat-window/)** ・ [A〜Fのゲーム一覧](https://kaxic.github.io/shiosai-game-library/#D)
 
 [実際のプレイ映像を見る](https://kaxic.github.io/shiosai-wheat-window/media/demo.mp4)
 
-![麦窓食堂のゲーム画面](Guides/Harvest.jpg)
+![D 畑と料理の食堂経営のゲーム画面](Guides/Harvest.jpg)
 
 [遊び方と手動で拡張する方法](Guides/Harvest.md)
 

@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 
 public static class StudioRelease
 {
-    [Serializable] class Definition {public string key="",title="",english="",product="",introduction="",controls="",accent="",ink="",paper="";}
+    [Serializable] class Definition {public string key="",title="",subtitle="",english="",product="",introduction="",controls="",accent="",ink="",paper="";}
     static Color Parse(string value){if(!ColorUtility.TryParseHtmlString(value,out var c))throw new Exception("色指定 "+value);return c;}
     public static void Build()
     {
@@ -27,7 +27,7 @@ public static class StudioRelease
             var skin=AssetDatabase.LoadAssetAtPath<StudioSkin>(root+"/Design.asset");
             if(!skin)
             {
-                skin=ScriptableObject.CreateInstance<StudioSkin>();skin.key=key;skin.title=def.title;skin.english=def.english;
+                skin=ScriptableObject.CreateInstance<StudioSkin>();skin.key=key;skin.title=def.title;skin.subtitle=def.subtitle;skin.english=def.english;
                 skin.product=def.product;skin.introduction=def.introduction;skin.controls=def.controls;
                 skin.accent=Parse(def.accent);skin.ink=Parse(def.ink);skin.paper=Parse(def.paper);
                 AssetDatabase.CreateAsset(skin,root+"/Design.asset");

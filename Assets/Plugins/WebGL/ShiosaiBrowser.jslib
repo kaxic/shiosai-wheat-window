@@ -8,7 +8,11 @@ mergeInto(LibraryManager.library, {
                 Module.shiosaiWriting = false;
                 if (error) console.warn("Save sync", error);
                 if (Module.shiosaiDirty) flush();
-                else if (Module.shiosaiClosing) location.reload();
+                else if (Module.shiosaiClosing) {
+                    Module.shiosaiClosing = false;
+                    if (error) window.shiosaiHomeFailed();
+                    else location.assign(document.getElementById("library-home").href);
+                }
             });
         }
         flush();
